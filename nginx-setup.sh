@@ -1,7 +1,6 @@
 #!/bin/bash
 
-read -p "Enter primary domain for Marzban Dashboard: " MARZBAN_DOMAIN
-read -p "Enter primary domain for phpMyAdmin: " PMA_DOMAIN
+read -p "Enter primary domain for Marzban Dashboard and phpMyAdmin: " PRIMARY_DOMAIN
 read -p "Enter primary domain for Sub-Site: " SUBSITE_DOMAIN
 
 apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring -y
@@ -75,7 +74,7 @@ rm -f /etc/nginx/conf.d/default.conf
 
 cat <<EOF > /etc/nginx/conf.d/marzban-dash.conf
 server {
-    server_name dash.${MARZBAN_DOMAIN};
+    server_name dash.${PRIMARY_DOMAIN};
 
     listen 8443 ssl;
     http2 on;
@@ -135,7 +134,7 @@ EOF
 
 cat <<EOF > /etc/nginx/conf.d/phpmyadmin.conf
 server {
-    server_name pma.${PMA_DOMAIN};
+    server_name pma.${PRIMARY_DOMAIN};
 
     listen 8443 ssl;
     http2 on;
