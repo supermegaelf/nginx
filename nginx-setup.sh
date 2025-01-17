@@ -1,7 +1,7 @@
 #!/bin/bash
 
-read -p "Enter primary domain for Marzban Dashboard and phpMyAdmin: " PRIMARY_DOMAIN
-read -p "Enter primary domain for Sub-Site: " SUBSITE_DOMAIN
+read -p "Marzban Dashboard and phpMyAdmin domain: " PRIMARY_DOMAIN
+read -p "Sub-Site domain: " SUBSITE_DOMAIN
 
 apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring -y
 
