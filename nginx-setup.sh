@@ -164,6 +164,65 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -out /etc/ssl/certs/nginx-selfsigned.crt \
     -subj "/CN=MyCert"
 
-openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+openssl dhparam -dsaparam -out /etc/ssl/certs/dhparam.pem 2048
 
 nginx -t && systemctl restart nginx
+
+cat <<EOF > /opt/marzban/docker-compose.yml
+services:
+  marzban:
+    image: gozargah/marzban:latest
+    restart: always
+    env_file: .env
+    network_mode: host
+    volumes:
+      - /var/lib/marzban:/var/lib/marzban
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+  mariadb:
+    image: mariadb:lts
+    env_file: .env
+    network_mode: host
+    restart: always
+    command:
+      - --bind-address=127.0.0.1
+      - --character_set_server=utf8mb4
+      - --collation_server=utf8mb4_unicode_ci
+      - --host-cache-size=0
+      - --innodb-open-files=1024
+      - --innodb-buffer-pool-size=268435456
+      - --binlog_expire_logs_seconds=5184000 # 60 days
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      start_interval: 3s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    restart: always
+    network_mode: host
+    environment:
+      PMA_HOST: 127.0.0.1
+      PMA_PORT: 3306
+      APACHE_PORT: 5010
+      PMA_ABSOLUTE_URI: https://pma.${PRIMARY_DOMAIN}/
+      UPLOAD_LIMIT: 300M
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+volumes:
+  mariadb_data:
+    name: mariadb_data
+    external: true
+
+EOF
+
+marzban restart
