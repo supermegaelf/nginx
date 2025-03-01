@@ -1,6 +1,6 @@
 #!/bin/bash
 
-read -p "Marzban Dashboard and phpMyAdmin domain: " PRIMARY_DOMAIN
+read -p "Marzban Dashboard: " PRIMARY_DOMAIN
 read -p "Sub-Site domain: " SUBSITE_DOMAIN
 
 apt update && apt install curl gnupg2 ca-certificates lsb-release -y
